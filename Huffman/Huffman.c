@@ -5,8 +5,8 @@
 
 struct HuffTree
 {
-	unsigned int frequencia; //frequencia do caractere no arquivo
-	void* valor;		//leitura da chave passada
+	int frequencia; //frequencia do caractere no arquivo
+	unsigned char c;		//chave passada
 	struct HuffTree *esq;	//filho a esq
 	struct HuffTree *dir;	//filho a dir
 };
@@ -14,7 +14,7 @@ struct HuffTree
 struct HuffTree init()
 {
 	struct HuffTree novo_valor = (struct Huff*)malloc(sizeof(struct Huff));
-	novo_valor->valor = NULL;
+	novo_valor->c = NULL;
 	novo_valor->frequencia = NULL;
 	novo_valor->esq = NULL;
 	novo_valor->dir =  NULL;
@@ -24,7 +24,7 @@ struct HuffTree init()
 struct HuffTree add(unsigned int frequencia, void* valor, struct HuffTree *esq, struct HuffTree *dir)
 {
 	struct HuffTree novo_valor = (struct Huff*)malloc(sizeof(struct Huff));
-	novo_valor->valor = valor;
+	novo_valor->c = valor;
 	novo_valor->frequencia = frequencia;
 	novo_valor->esq = esq;
 	novo_valor->dir =  dir;
