@@ -1,12 +1,14 @@
+//AINDA NAO TESTEI
+
 #include <stdio.h>
 #include <stdlib.h>
 
 struct HuffTree
 {
-	unsigned int frequencia;
-	void* valor;
-	struct HuffTree *esq;
-	struct HuffTree *dir;
+	unsigned int frequencia; //frequencia do caractere no arquivo
+	void* valor;		//leitura da chave passada
+	struct HuffTree *esq;	//filho a esq
+	struct HuffTree *dir;	//filho a dir
 };
 
 struct HuffTree init()
@@ -29,9 +31,9 @@ struct HuffTree add(unsigned int frequencia, void* valor, struct HuffTree *esq, 
 	return novo_valor;
 }
 
-unsigned char eh_folha(struct HuffTree huffman)
+int eh_folha(struct HuffTree huffman)
 {
-	if((huffman->esq == NULL) && (huffman->dir == NULL))
+	if((huffman != NULL) && (huffman->esq == NULL) && (huffman->dir == NULL))
 		return 1;
 	else
 		return 0;
