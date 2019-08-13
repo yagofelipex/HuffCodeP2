@@ -1,3 +1,13 @@
+/*
+ ============================================================================
+ Name        : Huffman.c
+ Author      : WILAMIS AVIZ
+ Version     :
+ Copyright   : Your copyright notice
+ Description : UMA TENTATIVA DE IMPLEMENTACAO DA CODIFICACAO DE HUFFMAN
+ ============================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,6 +45,11 @@ unsigned char eh_folha(struct HuffTree huffman)
 		return 1;
 	else
 		return 0;
+}
+
+void print_huffman()
+{
+
 }
 
 int main() {
