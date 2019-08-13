@@ -1,13 +1,3 @@
-/*
- ============================================================================
- Name        : Huffman.c
- Author      : WILAMIS AVIZ
- Version     :
- Copyright   : Your copyright notice
- Description : UMA TENTATIVA DE IMPLEMENTACAO DA CODIFICACAO DE HUFFMAN
- ============================================================================
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 
