@@ -77,6 +77,9 @@ int main()
     printf("Depois da remoção\n");
     Pop();
     View();
+    printf("Antes da remoção\n");
+    View();
     Pop();
-    View();++
+    printf("Depois da remoção\n");
+    View();
 }
