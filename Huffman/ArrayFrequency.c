@@ -20,7 +20,7 @@ int main()
     FILE *file_input; //variavel que guardará o arquivo de entrada
     unsigned char caracter;
     char nome_arquivo[30];
-	unsigned char string[256];
+    unsigned char string[256];
     int i = 0;
 
     zerar_array_frequencia(string);
