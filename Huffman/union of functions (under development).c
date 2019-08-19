@@ -127,7 +127,7 @@ scanf("%[^\n]", nome_arquivo);
 file_input = fopen(nome_arquivo, "rb");
 if(file_input == NULL)
 {
-printf("ERRO AO ABRIR ARQUIVO: %s\n", nome_arquivo);
+printf("Unable to open file: %s\n", nome_arquivo);
 return 0;
 }
 else
@@ -144,7 +144,5 @@ Insert(string[i],i,Heap);
 printf("Characters: %c Frequency: %d\n",i, string[i]);
 }
 }
-View(Heap);
-Pop(Heap);
 View(Heap);
 }
