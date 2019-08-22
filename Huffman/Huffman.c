@@ -15,6 +15,16 @@ typedef struct Array {
 	Nodes *table[Max];
 } heap;
 
+/*Nodes *BuildTreeHuff(int Ffrequency,int Sfrequency,char character)
+ {
+ Nodes *Node   = (Nodes*)malloc(sizeof(Nodes));
+ Node->Value_node = Ffrequency + Sfrequency;
+ Node->symbol     =  '*';
+ Node->left       = Node->right = NULL;
+ return Node;
+ } */
+/*we use this function for creat the nodes*/
+
 Nodes *CreatNode(int data, char character, Nodes * left, Nodes *right) {
 	Nodes* node = (Nodes*) malloc(sizeof(Nodes));
 	node->frequency = data;
@@ -111,25 +121,12 @@ void Insert(int Value, char character, heap *Heap) {
 }
 
 void print_huff_tree(Nodes *huff_node) {
-	if (huff_node == NULL) return;
-        printf("(");
-        if (huff_node->character == ' ') {
-        	printf("+");
-        }
-        else
-        {
-        	printf("%c %d", huff_node->character, huff_node->frequency);
-        }
-        if (huff_node->left == NULL) {
-            printf("()");
-        } else {
-            print_huff_tree(huff_node->left);
-        } if (huff_node->right == NULL) {
-            printf("()");
-        } else {
-            print_huff_tree(huff_node->right);
-        }
-        printf(")");
+	if(huff_node != NULL)
+	{
+		printf("%c ",huff_node->character);
+		print_huff_tree(huff_node->left);
+		print_huff_tree(huff_node->right);
+	}
 }
 
 int main() {
