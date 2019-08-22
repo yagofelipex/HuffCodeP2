@@ -15,16 +15,6 @@ typedef struct Array {
 	Nodes *table[Max];
 } heap;
 
-/*Nodes *BuildTreeHuff(int Ffrequency,int Sfrequency,char character)
- {
- Nodes *Node   = (Nodes*)malloc(sizeof(Nodes));
- Node->Value_node = Ffrequency + Sfrequency;
- Node->symbol     =  '*';
- Node->left       = Node->right = NULL;
- return Node;
- } */
-/*we use this function for creat the nodes*/
-
 Nodes *CreatNode(int data, char character, Nodes * left, Nodes *right) {
 	Nodes* node = (Nodes*) malloc(sizeof(Nodes));
 	node->frequency = data;
