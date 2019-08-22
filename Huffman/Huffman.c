@@ -1,162 +1,190 @@
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
 #include<string.h>
+#define Max 10000
 
-#define MAX 256
-
-typedef struct Tree
-{
-	int Value_node;
-	char symbol;
-	struct Tree *left;
-	struct Tree *right;
-} HuffTree;
-
-typedef struct data
-{
+typedef struct Tree {
 	int frequency;
 	char character;
-	struct data *next;
+	struct Tree *left;
+	struct Tree *right;
 } Nodes;
 
-typedef struct Array
-{
-	Nodes *table[MAX];
-} Hash;
+typedef struct Array {
+	int size;
+	Nodes *table[Max];
+} heap;
 
+/*Nodes *BuildTreeHuff(int Ffrequency,int Sfrequency,char character)
+ {
+ Nodes *Node   = (Nodes*)malloc(sizeof(Nodes));
+ Node->Value_node = Ffrequency + Sfrequency;
+ Node->symbol     =  '*';
+ Node->left       = Node->right = NULL;
+ return Node;
+ } */
 /*we use this function for creat the nodes*/
-Nodes *CreatNode(int data,char character)
-{
-	Nodes* node     = (Nodes*)malloc(sizeof(Nodes));
+
+Nodes *CreatNode(int data, char character, Nodes * left, Nodes *right) {
+	Nodes* node = (Nodes*) malloc(sizeof(Nodes));
 	node->frequency = data;
 	node->character = character;
+	node->left = left;
+	node->right = right;
 	return node;
 }
-
-/*Here in this function we're going creat a node with sum of the elements*/
-/*HuffTree *Creation(int Ffrequency,int Sfrequency,char character)
-{
-	HuffTree *Node   = (HuffTree*)malloc(sizeof(HuffTree));
-	Node->Value_node = Ffrequency + Sfrequency;
-	Node->symbol     =  '*';
-	Node->left       = Node->right = NULL;
-	return Node;
-}*/
-
-HuffTree *create_nodes_huff(Nodes *node)
-{
-	HuffTree *Node   = (HuffTree*)malloc(sizeof(HuffTree));
-	Node->Value_node = node->frequency;
-	Node->symbol     = node->character;
-	Node->left       = Node->right = NULL;
-	return Node;
-}
-
 /*It's in this function where we creat a array of pointers*/
-Hash *CreatTable(int size_table)
-{
+
+heap *CreatTable(int size_table) {
 	int i;
-	Hash *Table = (Hash*)malloc(sizeof(Hash));
-	for(i = 0;i < size_table;i++)
-	{
+	heap *Table = (heap*) malloc(sizeof(heap));
+	for (i = 0; i < size_table; i++) {
 		Table->table[i] = NULL;
 	}
 	return Table;
 }
 
-void print_hash_table(Hash *Hash,int size)
-{
+// swap two min heap nodes//
+void Swap(Nodes* *a, Nodes* *b) {
+	Nodes *t = *a;
+	*a = *b;
+	*b = t;
+}
+
+int GetParentIndex(int index) {
+	return index / 2;
+}
+
+int GetChildrenLeftIndex(int index) {
+	return index * 2;
+}
+
+int GetChildrenRightIndex(int index) {
+	return index * 2 + 1;
+}
+
+void View(heap *Heap) {
 	int i;
-	for (i = 0;i < size;i++)
-	{
-		printf("%d %c\n",Hash->table[i]->frequency,Hash->table[i]->character);
+	for (i = 1; i <= Heap->size; i++) {
+		printf(" %d %c ", Heap->table[i]->frequency, Heap->table[i]->character);
+	}
+	//printf("\n");
+}
+
+void DownHeapMin(int index, heap *Heap) {
+	if (index * 2 > Heap->size)
+		return;
+	int left = GetChildrenLeftIndex(index);
+	int Right = GetChildrenRightIndex(index);
+	int smallest = index;
+	if (left <= Heap->size
+			&& Heap->table[left]->frequency
+					< Heap->table[smallest]->frequency) {
+		smallest = left;
+	}
+	if (Right <= Heap->size
+			&& Heap->table[Right]->frequency
+					< Heap->table[smallest]->frequency) {
+		smallest = Right;
+	}
+	if (smallest == index)
+		return;
+	Swap(&Heap->table[index], &Heap->table[smallest]);
+	DownHeapMin(smallest, Heap);
+}
+
+Nodes *Pop(heap *Heap) {
+	if (Heap->size == 0) {
+		return 0;
+	}
+	Nodes *aux = Heap->table[1];
+	Heap->table[1] = Heap->table[Heap->size];
+	Heap->size--;
+	DownHeapMin(1, Heap);
+	return aux;
+}
+
+void UpHeapMin(int index, heap *Heap) {
+	if (index <= 1)
+		return;
+	int Parentidx = GetParentIndex(index);
+	if (Heap->table[index]->frequency < Heap->table[Parentidx]->frequency) {
+		Swap(&Heap->table[index], &Heap->table[Parentidx]);
+		UpHeapMin(Parentidx, Heap);
 	}
 }
 
-void print_huff_tree(HuffTree *huff_node) {
+void Insert(int Value, char character, heap *Heap) {
+	Heap->size++;
+	Heap->table[Heap->size] = CreatNode(Value, character, NULL, NULL);
+	UpHeapMin(Heap->size, Heap);
+}
+
+void print_huff_tree(Nodes *huff_node) {
 	if (huff_node == NULL) return;
-	printf("(");
-	if (huff_node->symbol == ' ') {
-		printf("+");
-	}
-	else
-	{
-		printf("%d ", huff_node->Value_node);
-		printf("%c", huff_node->symbol);
-	}
-	if (huff_node->left == NULL) {
-		printf("()");
-	} else {
-		print_huff_tree(huff_node->left);
-	} if (huff_node->right == NULL) {
-		printf("()");
-	} else {
-		print_huff_tree(huff_node->right);
-	}
-	printf(")");
+        printf("(");
+        if (huff_node->character == ' ') {
+        	printf("+");
+        }
+        else
+        {
+        	printf("%c %d", huff_node->character, huff_node->frequency);
+        }
+        if (huff_node->left == NULL) {
+            printf("()");
+        } else {
+            print_huff_tree(huff_node->left);
+        } if (huff_node->right == NULL) {
+            printf("()");
+        } else {
+            print_huff_tree(huff_node->right);
+        }
+        printf(")");
 }
 
-int main()
-{
+int main() {
 	FILE *file_input; //variavel que guardará o arquivo de entrada
 	unsigned char caracter;
 	char nome_arquivo[30];
-	unsigned int *string = (unsigned int*)calloc(256,sizeof(unsigned int));
-	int i = 0;
-	int cont = 0;
+	Nodes *root;
+//every time we call the function we're going to have to pass character and value that we want to add in Heap //
+	heap *Heap = CreatTable(256);
+	Heap->size = 0;
+//Testes//
+	unsigned int *string = (unsigned int*) calloc(256, sizeof(unsigned int));
+	int cont, i;
+	i = cont = 0;
 	scanf("%[^\n]", nome_arquivo);
 	file_input = fopen(nome_arquivo, "rb");
-	int tam_hash = 0;
-	int j = 0;
-	int *indice = (int*)malloc(256 * sizeof(int));
-
-	if(file_input == NULL)
-	{
-		printf("ERRO AO ABRIR ARQUIVO: %s\n", nome_arquivo);
+	if (file_input == NULL) {
+		printf("Unable to open file: %s\n", nome_arquivo);
 		return 0;
-	}
-	else
-	{
-		while(fscanf(file_input, "%c", &caracter) != EOF)
-		{
-			//printf("%c", caracter);
+	} else {
+		while (fscanf(file_input, "%c", &caracter) != EOF) {
 			string[caracter]++;
+			//printf("%c", caracter);
+		}
+	}
+	for (i = 0; i < 256; i++) {
+		if (string[i] >= 1) {
+			Insert(string[i], i, Heap);
+			printf("Characters: %c Frequency: %d\n", i, string[i]);
 		}
 	}
 
-	for(i = 0; i < 256; i++)
+	while(Heap->size != 1)
 	{
-		if(string[i] >= 1)
-		{
-		//	printf("Characters: %c Frequency: %d\n",i, string[i]);
-			tam_hash++;
-			indice[j] = i;
-			j++;
-		}
-		/*Nodes* node = CreatNode(string[i], 'i');
-		Heap->table[i] = node;*/
+		Nodes *left = Pop(Heap);
+		Nodes *right = Pop(Heap);
+		int sum = left->frequency + right->frequency;
+		Heap->size++;
+		Heap->table[Heap->size] = CreatNode(sum, '*', left, right);
+		UpHeapMin(Heap->size, Heap);
 	}
-	//printf("%d\n", tam_heap);
-	Hash *hash = CreatTable(tam_hash);
+	root = Heap->table[1];
 
-	for(i = 0; i < tam_hash; i++)
-	{
-		Nodes* node = CreatNode(string[indice[i]], indice[i]);
-		hash->table[i] = node;
-		HuffTree *Node_h = create_nodes_huff(hash->table[i]);
-		print_huff_tree(Node_h);
-		//printf("Characters: %c Frequency: %d\n",indice[i], string[indice[i]]);
-		//printf("%d\n", indice[i]);
-	}
-	printf("\n");
-    //HuffTree *Node  = Creation(5,5);
-    //HuffTree *Node1 = Creation(5,20);
-    //Testes//
-    /*Nodes* node = CreatNode(2,'A');
-    Nodes* node2 = CreatNode(5,'B');
-    Heap->table[0] = node;
-    Heap->table[1] = node2;
-    print_heap_table(Heap,2);*/
-	//print_hash_table(hash,tam_hash);
+	//Nodes *root = Heap[1];
+
+	//View(Heap);
+	print_huff_tree(root);
 }
