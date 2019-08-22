@@ -123,7 +123,7 @@ void Insert(int Value, char character, heap *Heap) {
 void print_huff_tree(Nodes *huff_node) {
 	if(huff_node != NULL)
 	{
-		printf("%c ",huff_node->character);
+		printf("%c",huff_node->character);
 		print_huff_tree(huff_node->left);
 		print_huff_tree(huff_node->right);
 	}
@@ -174,4 +174,5 @@ int main() {
 
 	//View(Heap);
 	print_huff_tree(root);
+	printf("\n");
 }
