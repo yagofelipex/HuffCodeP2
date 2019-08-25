@@ -277,15 +277,13 @@ int convert_size_tree_to_bin(int size_tree, int bin[]) {
 	return *bin;
 }
 
-void descompress()
-{
+void descompress() {
 	Nodes *root = construct_tree();
 	int size_file;
 	//print_tree_huffman(root);
 }
 
-void compress()
-{
+void compress() {
 	Nodes *root = construct_tree();
 	int size_tree = 0;
 	char vetor[MAX];
