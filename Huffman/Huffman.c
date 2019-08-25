@@ -232,23 +232,24 @@ void Encode(Nodes *root, char arr[], int top)
 	}
 }
 
-void Decode(Nodes* root, char array[], int index) {
-	if (root == NULL) {
-		return;
-	}
+//////////////////NAO FUNFA///////////////////////////
+/*void Decode(Nodes* root, char array[], int index) {
+ if (root == NULL) {
+ return;
+ }
 
-	// found a leaf node
-	if (eh_folha(root)) {
-		printf("%c ", root->character);
-		return;
-	}
+ // found a leaf node
+ if (eh_folha(root)) {
+ printf("%c ", root->character);
+ return;
+ }
 
-	if (array[index] == '0') {
-		Decode(root->left, array, index + 1);
-	} else if (array[index] == '1') {
-		Decode(root->right, array, index + 1);
-	}
-}
+ if (array[index] == '0') {
+ Decode(root->left, array, index + 1);
+ } else if (array[index] == '1') {
+ Decode(root->right, array, index + 1);
+ }
+ }*/
 
 void tam_tree(Nodes *node_huffman, int *size) {
 	if (node_huffman == NULL) {
@@ -278,9 +279,21 @@ int convert_size_tree_to_bin(int size_tree, int bin[]) {
 }
 
 void descompress() {
-	Nodes *root = construct_tree();
-	int size_file;
-	//print_tree_huffman(root);
+	FILE *file_input_descompress; //variavel que guardará o arquivo de entrada
+	char nome_arquivo[30];
+	unsigned char character;
+	scanf("%[^\n]", nome_arquivo);
+	file_input_descompress = fopen(nome_arquivo, "rb");
+	if (file_input_descompress == NULL) {
+		printf("Unable to open file: %s\n", nome_arquivo);
+		return;
+	}
+
+	 fscanf(file_input_descompress, "%c", &character);
+		//Nodes *root = construct_tree();
+		//int size_file = ftell(input_file); //o ARQUIVO ESTA EM construct_tree() como farei?
+
+		//print_tree_huffman(root);
 }
 
 void compress() {
