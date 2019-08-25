@@ -190,7 +190,6 @@ Nodes *construct_tree() {
 	while (!(Heap->size == 1)) {
 		left = Pop(Heap);
 		right = Pop(Heap);
-
 		Insert(left->frequency + right->frequency, '*', Heap, left, right);
 	}
 	//Nodes *root = Heap[1];
@@ -278,7 +277,15 @@ int convert_size_tree_to_bin(int size_tree, int bin[]) {
 	return *bin;
 }
 
-int main() {
+void descompress()
+{
+	Nodes *root = construct_tree();
+	int size_file;
+	//print_tree_huffman(root);
+}
+
+void compress()
+{
 	Nodes *root = construct_tree();
 	int size_tree = 0;
 	char vetor[MAX];
@@ -291,6 +298,7 @@ int main() {
 	printf("TAM DA ARVORE EM DECIMAL: %d\n", size_tree);
 	//printf("%d", tam_str);
 	//Decode(root, vetor, );
+	printf("PRE ORDEM: ");
 	print_tree_huffman(root);
 	printf("\n");
 	convert_size_tree_to_bin(size_tree, bin_tam);
@@ -299,5 +307,15 @@ int main() {
 		printf("%d", bin_tam[i]);
 	}
 	printf("\n");
+}
+
+int main() {
+	////////////////////DESCOMPRESSAO///////////////////////////////////
+	descompress();
+	////////////////////////////////////////////////////////////////////
+
+	////////////////////COMPRESSAO//////////////////////////////////////
+	//compress();
+	////////////////////////////////////////////////////////////////////
 	return 0;
 }
