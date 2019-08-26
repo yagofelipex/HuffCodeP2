@@ -232,25 +232,6 @@ void Encode(Nodes *root, char arr[], int top)
 	}
 }
 
-//////////////////NAO FUNFA///////////////////////////
-/*void Decode(Nodes* root, char array[], int index) {
- if (root == NULL) {
- return;
- }
-
- // found a leaf node
- if (eh_folha(root)) {
- printf("%c ", root->character);
- return;
- }
-
- if (array[index] == '0') {
- Decode(root->left, array, index + 1);
- } else if (array[index] == '1') {
- Decode(root->right, array, index + 1);
- }
- }*/
-
 void tam_tree(Nodes *node_huffman, int *size) {
 	if (node_huffman == NULL) {
 		return;
@@ -267,7 +248,7 @@ void tam_tree(Nodes *node_huffman, int *size) {
 int convert_size_tree_to_bin(int size_tree, int bin[]) {
 	int aux;
 
-	for (aux = 7; aux >= 0; aux--) {
+	for (aux = 13; aux >= 0; aux--) {
 		if (size_tree % 2 == 0) {
 			bin[aux] = 0;
 		} else {
@@ -314,7 +295,7 @@ void compress() {
 	printf("\n");
 	convert_size_tree_to_bin(size_tree, bin_tam);
 
-	for (i = 0; i < 8; i++) {
+	for (i = 0; i < 14; i++) {
 		printf("%d", bin_tam[i]);
 	}
 	printf("\n");
@@ -322,11 +303,11 @@ void compress() {
 
 int main() {
 	////////////////////DESCOMPRESSAO///////////////////////////////////
-	descompress();
+	//descompress();
 	////////////////////////////////////////////////////////////////////
 
 	////////////////////COMPRESSAO//////////////////////////////////////
-	//compress();
+	compress();
 	////////////////////////////////////////////////////////////////////
 	return 0;
 }
