@@ -129,9 +129,9 @@ void Insert(int Value, char character, heap *Heap, Nodes *left, Nodes *right) {
 void print_tree_huffman(Nodes *huffman_node) {
 	if (huffman_node != NULL) {
 		if (((huffman_node->character == '*')
-				|| (huffman_node->character == '\\'))
+				|| (huffman_node->character == 92))
 				&& eh_folha(huffman_node)) {
-			printf("%c", '\\');
+			printf("%c", 92);
 		}
 
 		printf("%c", huffman_node->character);
@@ -143,9 +143,9 @@ void print_tree_huffman(Nodes *huffman_node) {
 void print_tree_huffman_file(FILE *output_file, Nodes *huffman_node) {
 	if (huffman_node != NULL) {
 		if (((huffman_node->character == '*')
-				|| (huffman_node->character == '\\'))
+				|| (huffman_node->character == 92))
 				&& eh_folha(huffman_node)) {
-			fprintf(output_file, "%c", '\\');
+			fprintf(output_file, "%c", 92);
 		}
 
 		fprintf(output_file, "%c", huffman_node->character);
@@ -155,14 +155,15 @@ void print_tree_huffman_file(FILE *output_file, Nodes *huffman_node) {
 }
 
 Nodes *construct_tree() {
-	FILE *file_input; //variavel que guardará o arquivo de entrada
+	FILE *file_input, file_output; //variavel que guardará o arquivo de entrada e saida
 	unsigned char caracter;
 	char nome_arquivo[30];
 	Nodes *root;
 	Nodes *left;
 	Nodes *right;
 	Nodes *top;
-//every time we call the function we're going to have to pass character and value that we want to add in Heap //
+	int byte = 0;
+
 	heap *Heap = CreatTable(256);
 	Heap->size = 0;
 
@@ -177,9 +178,13 @@ Nodes *construct_tree() {
 	} else {
 		while (fscanf(file_input, "%c", &caracter) != EOF) {
 			string[caracter]++;
+			byte++;
 			//printf("%c", caracter);
 		}
 	}
+	printf("****************************************\n");
+	printf("SIZE FILE: %d\n", byte);
+	printf("****************************************\n");
 	for (i = 0; i < 256; i++) {
 		if (string[i] >= 1) {
 			Insert(string[i], i, Heap, NULL, NULL);
@@ -222,27 +227,56 @@ void Encode(Nodes *root, char arr[], int top)
 		Encode(root->right, arr, top + 1);
 	}
 
-	// If this is a leaf node, then
-	// it contains one of the input
-	// characters, print the character
-	// and its code from arr[]
 	if (eh_folha(root)) {
 		printf("%c: ", root->character);
 		printVetor(arr, top);
 	}
 }
 
-void tam_tree(Nodes *node_huffman, int *size) {
-	if (node_huffman == NULL) {
-		return;
+unsigned long long int tree_size(Nodes* raiz)
+{
+	if(raiz == NULL)
+	{
+		return 0;
 	}
-	if ((eh_folha(node_huffman) && node_huffman->character == '*')
-			|| (eh_folha(node_huffman) && node_huffman->character == '\\')) {
-		*size += 1;
+	else
+	{
+		return  1 + tree_size(raiz->left) + tree_size(raiz -> right);
 	}
-	*size += 1;
-	tam_tree(node_huffman->left, size);
-	tam_tree(node_huffman->right, size);
+}
+
+int esta_vazia(Nodes *raiz)
+{
+  return(raiz == NULL);
+}
+
+int lenght_tree(Nodes *raiz)
+{
+  int cont = 0;
+  if (!esta_vazia(raiz))
+  {
+    if (eh_folha(raiz) && (raiz->character == '*' || raiz->character == 92))
+    {
+    	cont = 1;
+    }
+
+    cont = cont + 1 + lenght_tree(raiz->left);
+    cont = cont + lenght_tree(raiz->right);
+  }
+
+  return(cont);
+}
+
+void *header(int lenght_trash, int lenght_tree, Nodes *root, FILE* fileout)
+{
+	unsigned char *value = (unsigned char *)malloc(3 * sizeof(unsigned char));
+	value[0] = lenght_trash << 5 | lenght_tree >> 8;
+	value[1] = lenght_tree;
+	value[2] = '\0';
+
+	fputc(value[0], fileout);
+	fputc(value[1], fileout);
+	print_tree_huffman_file(fileout, root);
 }
 
 int convert_size_tree_to_bin(int size_tree, int bin[]) {
@@ -279,15 +313,14 @@ void descompress() {
 
 void compress() {
 	Nodes *root = construct_tree();
-	int size_tree = 0;
+	unsigned long long int size_tree;
 	char vetor[MAX];
 	int bin_tam[8];
 	int i = 0;
-	//vetor = (char *)malloc(sizeof(char) * MAX);
 	Encode(root, vetor, i);
 	int tam_str = strlen(vetor);
-	tam_tree(root, &size_tree);
-	printf("TAM DA ARVORE EM DECIMAL: %d\n", size_tree);
+	size_tree = lenght_tree(root);
+	printf("TAM DA ARVORE EM DECIMAL: %lld\n", size_tree);
 	//printf("%d", tam_str);
 	//Decode(root, vetor, );
 	printf("PRE ORDEM: ");
