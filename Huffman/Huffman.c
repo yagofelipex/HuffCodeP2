@@ -16,6 +16,15 @@ typedef struct Array {
 	Nodes *table[MAX];
 } heap;
 
+typedef struct SaveValues {
+	int frequencia;
+	unsigned char bits[30];
+} NewValue;
+
+typedef struct Hash {
+	NewValue *array[256];
+} hash;
+
 Nodes *CreatNode(int data, char character, Nodes * left, Nodes *right) {
 	Nodes* node = (Nodes*) malloc(sizeof(Nodes));
 	node->frequency = data;
@@ -128,8 +137,7 @@ void Insert(int Value, char character, heap *Heap, Nodes *left, Nodes *right) {
 
 void print_tree_huffman(Nodes *huffman_node) {
 	if (huffman_node != NULL) {
-		if (((huffman_node->character == '*')
-				|| (huffman_node->character == 92))
+		if (((huffman_node->character == '*') || (huffman_node->character == 92))
 				&& eh_folha(huffman_node)) {
 			printf("%c", 92);
 		}
@@ -142,8 +150,7 @@ void print_tree_huffman(Nodes *huffman_node) {
 
 void print_tree_huffman_file(FILE *output_file, Nodes *huffman_node) {
 	if (huffman_node != NULL) {
-		if (((huffman_node->character == '*')
-				|| (huffman_node->character == 92))
+		if (((huffman_node->character == '*') || (huffman_node->character == 92))
 				&& eh_folha(huffman_node)) {
 			fprintf(output_file, "%c", 92);
 		}
@@ -152,6 +159,15 @@ void print_tree_huffman_file(FILE *output_file, Nodes *huffman_node) {
 		print_tree_huffman_file(output_file, huffman_node->left);
 		print_tree_huffman_file(output_file, huffman_node->right);
 	}
+}
+
+long long int FileSize(FILE *in) {
+	long long int bytes;
+	if (in != NULL) {
+		fseek(in, 0, SEEK_END);
+		bytes = ftell(in);
+	}
+	return bytes;
 }
 
 Nodes *construct_tree() {
@@ -170,7 +186,8 @@ Nodes *construct_tree() {
 	unsigned int *string = (unsigned int*) calloc(256, sizeof(unsigned int));
 	int cont, i;
 	i = cont = 0;
-	scanf("%[^\n]", nome_arquivo);
+	printf("Informe o nome do arquivo.\n");
+	scanf("%s", nome_arquivo);
 	file_input = fopen(nome_arquivo, "rb");
 	if (file_input == NULL) {
 		printf("Unable to open file: %s\n", nome_arquivo);
@@ -182,9 +199,9 @@ Nodes *construct_tree() {
 			//printf("%c", caracter);
 		}
 	}
-	printf("****************************************\n");
-	printf("SIZE FILE: %d\n", byte);
-	printf("****************************************\n");
+	/*printf("****************************************\n");
+	printf("SIZE FILE: %lld\n", FileSize(file_input));
+	printf("****************************************\n");*/
 	for (i = 0; i < 256; i++) {
 		if (string[i] >= 1) {
 			Insert(string[i], i, Heap, NULL, NULL);
@@ -210,66 +227,59 @@ void printVetor(char v[], int tam) {
 	printf("\n");
 }
 
-void Encode(Nodes *root, char arr[], int top)
+void Encode(Nodes *root, char arr[], int i)
 
 {
 	// Assign 0 to left edge and recur
 	if (root->left) {
 
-		arr[top] = '0';
-		Encode(root->left, arr, top + 1);
+		arr[i] = '0';
+		Encode(root->left, arr, i + 1);
 	}
 
 	// Assign 1 to right edge and recur
 	if (root->right) {
 
-		arr[top] = '1';
-		Encode(root->right, arr, top + 1);
+		arr[i] = '1';
+		Encode(root->right, arr, i + 1);
 	}
 
 	if (eh_folha(root)) {
 		printf("%c: ", root->character);
-		printVetor(arr, top);
+		//qtd_bits[root->character] = byte;
+		printVetor(arr, i);
 	}
 }
 
-unsigned long long int tree_size(Nodes* raiz)
-{
-	if(raiz == NULL)
-	{
+unsigned long long int tree_size(Nodes* raiz) {
+	if (raiz == NULL) {
 		return 0;
-	}
-	else
-	{
-		return  1 + tree_size(raiz->left) + tree_size(raiz -> right);
+	} else {
+		return 1 + tree_size(raiz->left) + tree_size(raiz->right);
 	}
 }
 
-int esta_vazia(Nodes *raiz)
-{
-  return(raiz == NULL);
+int esta_vazia(Nodes *raiz) {
+	return (raiz == NULL);
 }
 
-int lenght_tree(Nodes *raiz)
-{
-  int cont = 0;
-  if (!esta_vazia(raiz))
-  {
-    if (eh_folha(raiz) && (raiz->character == '*' || raiz->character == 92))
-    {
-    	cont = 1;
-    }
+int lenght_tree(Nodes *raiz) {
+	int cont = 0;
+	if (!esta_vazia(raiz)) {
+		if (eh_folha(raiz)
+				&& (raiz->character == '*' || raiz->character == 92)) {
+			cont = 1;
+		}
 
-    cont = cont + 1 + lenght_tree(raiz->left);
-    cont = cont + lenght_tree(raiz->right);
-  }
+		cont = cont + 1 + lenght_tree(raiz->left);
+		cont = cont + lenght_tree(raiz->right);
+	}
 
-  return(cont);
+	return (cont);
 }
 
-void *header(int lenght_trash, int lenght_tree, Nodes *root, FILE* fileout)
-{
-	unsigned char *value = (unsigned char *)malloc(3 * sizeof(unsigned char));
+void header(int lenght_trash, int lenght_tree, Nodes *root, FILE* fileout) {
+	unsigned char *value = (unsigned char *) malloc(3 * sizeof(unsigned char));
 	value[0] = lenght_trash << 5 | lenght_tree >> 8;
 	value[1] = lenght_tree;
 	value[2] = '\0';
@@ -293,22 +303,159 @@ int convert_size_tree_to_bin(int size_tree, int bin[]) {
 	return *bin;
 }
 
+int is_bit_set(unsigned char byte, int i) {
+
+	unsigned int aux = 1;
+	aux = aux << (unsigned int) i;
+	return (aux & byte);
+}
+
+/*int Cont_lixo_file(int qtd_bits[], heap Heap)
+ {
+ int i;
+ long long int lixo = 0;
+ for(i = 0; i < 256; i ++)
+ {
+ if(Heap->table->frequency != NULL)
+ {
+ lixo += (qtd_bits[i] * Heap->table[i]->frequency) % 8;
+ }
+ }
+
+ lixo = 8 - (lixo % 8);
+
+ return lixo;
+ }*/
+
+Nodes *construct_tree_descompress(Nodes *Nodes_huff, FILE *file_input_comprimido) {
+	unsigned char c;
+	fscanf(file_input_comprimido, "%c", &c);
+
+	if (c == 42) {
+		Nodes_huff = CreatNode(0, c, NULL, NULL);
+		Nodes_huff->left = construct_tree_descompress(Nodes_huff->left,
+				file_input_comprimido);
+		Nodes_huff->right = construct_tree_descompress(Nodes_huff->right,
+				file_input_comprimido);
+	} else {
+		if (c == '\\') {
+			fscanf(file_input_comprimido, "%c", &c);
+		}
+		Nodes_huff = CreatNode(0, c, NULL, NULL);
+	}
+	return Nodes_huff;
+}
+
+void *get_header(FILE *file, unsigned int *tam_lixo, unsigned int *tam_arv)
+{
+    unsigned char bytes_cabecalho = (unsigned char)fgetc(file);
+    *(tam_lixo) = bytes_cabecalho >> 5;
+
+    unsigned char five_bytes_from_tree = bytes_cabecalho << 3;
+    *(tam_arv) = five_bytes_from_tree >> 3;
+    bytes_cabecalho = (unsigned char)fgetc(file);
+    *(tam_arv) <<= 8;
+    *(tam_arv) |= bytes_cabecalho;
+}
+
 void descompress() {
 	FILE *file_input_descompress; //variavel que guardará o arquivo de entrada
+	FILE *file_output;
 	char nome_arquivo[30];
+	int j;
+	Nodes *temp;
 	unsigned char character;
-	scanf("%[^\n]", nome_arquivo);
+	unsigned int tam_lixo, tam_arv;
+	int i;
+	long long int tam_file = 0;
+	long long int bytes = 0;
+	char arquivo_saida[100];
+	int tam_arquivo_entrada = 0;
+	printf("Nome do arquivo a descompactar?\n");
+	scanf("%s", nome_arquivo);
 	file_input_descompress = fopen(nome_arquivo, "rb");
 	if (file_input_descompress == NULL) {
 		printf("Unable to open file: %s\n", nome_arquivo);
 		return;
 	}
+	bytes = FileSize(file_input_descompress);
+	fclose(file_input_descompress);
+	file_input_descompress = fopen(nome_arquivo, "rb");
+	/*while(fscanf(file_input_descompress, "%c", &character) != EOF)
+	{
+		tam_file++;
+	}*/
+	tam_arquivo_entrada = strlen(nome_arquivo);
 
-	 fscanf(file_input_descompress, "%c", &character);
-		//Nodes *root = construct_tree();
-		//int size_file = ftell(input_file); //o ARQUIVO ESTA EM construct_tree() como farei?
+	int *header;
+	get_header(file_input_descompress, &tam_lixo, &tam_arv);
+	Nodes *root = construct_tree_descompress(root,
+			file_input_descompress);
+	Nodes *root_aux = root;
+	print_tree_huffman(root);
+	printf("\n");
 
-		//print_tree_huffman(root);
+	//printf("TAM FILE: %lld\n", tam_file);
+
+	printf("TAM FILE: %lld\n", bytes);
+	printf("TAM LIXO: %d | TAM TREE: %d\n", tam_lixo, tam_arv);
+	for (i = 0; i < tam_arquivo_entrada - 5; i++) {
+		arquivo_saida[i] = nome_arquivo[i];
+	}
+	arquivo_saida[i] = '\0';
+
+	//printf("%s\n", arquivo_saida);
+	file_output = fopen(arquivo_saida, "wb");
+
+	temp = root;
+	//printf("%d %d\n", header[0], header[1]);
+	while (bytes > 0)
+	{
+		fscanf(file_input_descompress, "%c", &character);
+		//printf("%c\n", character);
+		if(bytes != 1)
+		{
+			for(i = 7; i>=0; i--)
+			{
+				if(is_bit_set(character, i))
+				{
+					root_aux = root_aux->right;
+				}
+				else
+				{
+					root_aux = root_aux->left;
+				}
+				if(eh_folha(root_aux))
+				{
+					fprintf(file_output, "%c", root_aux->character);
+					root_aux = root;
+				}
+			}
+		}
+		else
+		{
+			for(i = 7; i>=tam_lixo; i--)
+			{
+				if(is_bit_set(character, i))
+				{
+					root_aux = root_aux->right;
+				}
+				else
+				{
+					root_aux = root_aux->left;
+				}
+				if(eh_folha(root_aux))
+				{
+					fprintf(file_output, "%c", root_aux->character);
+					root_aux = root;
+				}
+			}
+		}
+		bytes -= 1;
+	}
+
+	fclose(file_input_descompress);
+	fclose(file_output);
 }
 
 void compress() {
@@ -334,13 +481,26 @@ void compress() {
 	printf("\n");
 }
 
-int main() {
-	////////////////////DESCOMPRESSAO///////////////////////////////////
-	//descompress();
-	////////////////////////////////////////////////////////////////////
-
-	////////////////////COMPRESSAO//////////////////////////////////////
-	compress();
-	////////////////////////////////////////////////////////////////////
+int main(void) {
+	int op;
+	printf("////////////////////////////////////\n");
+	printf("INFORME O QUE DESEJA REALIZAR:\n");
+	printf("1 - COMPRESSAO | 2 - DESCOMPRESSAO\n");
+	printf("////////////////////////////////////\n");
+	scanf("%d", &op);
+	switch(op)
+	{
+		case 0:
+			break;
+		case 1:
+			compress();
+			break;
+		case 2:
+			descompress();
+			break;
+		default:
+			printf("OPCAO INVALIDA!");
+			break;
+	}
 	return 0;
 }
