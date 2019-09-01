@@ -6,7 +6,7 @@ Professor da disciplina:
 Márcio Ribeiro          - Professor Adjunto           - marcio@ic.ufal.br
 
 Participantes:
-Elygledson José         - Ciência da Computação       - ejsb@ic.ufal.br
+Elygledson José         - Ciência da Computação       - ejsb2@ic.ufal.br
 Yago Felipe             - Ciência da Computação       - yflf@ic.ufal.br
 Marconde José da Silva  - Ciência da Computação       - FALTA MANDAR
 Alasson de Araújo       - Ciência da Computação       - aaa4@ic.ufal.br
