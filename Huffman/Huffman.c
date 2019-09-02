@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <Descompress.h>
 
 #define MAX 10000
 
@@ -18,7 +17,8 @@ typedef struct Array {
 } heap;
 
 typedef struct SaveValues {
-	int frequencia;
+	unsigned int frequencia;
+	char c;
 	unsigned char bits[30];
 } NewValue;
 
@@ -43,6 +43,19 @@ heap *CreatTable(int size_table) {
 		Table->table[i] = NULL;
 	}
 	return Table;
+}
+
+hash *create_hash()
+{
+    hash* HASH = (hash*) malloc(sizeof(hash));
+
+    for (int i = 0; i < 256; i++)
+    {
+    	HASH->array[i] = (NewValue*) malloc(sizeof(NewValue));
+    	HASH->array[i]->frequencia = 0;
+    	//HASH->array[i]->bits[0] = '\0';
+    }
+    return HASH;
 }
 
 // swap two min heap nodes//
@@ -171,10 +184,10 @@ long long int FileSize(FILE *in) {
 	return bytes;
 }
 
-Nodes *construct_tree() {
-	FILE *file_input, file_output; //variavel que guardará o arquivo de entrada e saida
+Nodes *construct_tree(char nome_arquivo[], FILE *file_input) {
+	FILE *file_output; //variavel que guardará o arquivo de entrada e saida
 	unsigned char caracter;
-	char nome_arquivo[30];
+	//char nome_arquivo[30];
 	Nodes *root;
 	Nodes *left;
 	Nodes *right;
@@ -187,8 +200,6 @@ Nodes *construct_tree() {
 	unsigned int *string = (unsigned int*) calloc(256, sizeof(unsigned int));
 	int cont, i;
 	i = cont = 0;
-	printf("Informe o nome do arquivo.\n");
-	scanf("%s", nome_arquivo);
 	file_input = fopen(nome_arquivo, "rb");
 	if (file_input == NULL) {
 		printf("Unable to open file: %s\n", nome_arquivo);
@@ -220,35 +231,44 @@ Nodes *construct_tree() {
 	//View(Heap);
 }
 
-void printVetor(char v[], int tam) {
-	int i;
-	for (i = 0; i < tam; i += 1) {
-		printf("%c", v[i]);
+void SaveInHash(char v[], long long int tam, hash *HASH, char c, unsigned int freq) {
+	int j;
+
+	HASH->array[c]->frequencia = freq;
+	HASH->array[c]->c = c;
+
+	for (j = 0; j < tam; j++) {
+		//printf("%c", v[j]);
+		//int lng = strlen(v);
+		HASH->array[c]->bits[j] = v[j];
 	}
-	printf("\n");
+
+	//printf("\n");
 }
 
-void Encode(Nodes *root, char arr[], int i)
-
+void Encode(Nodes *root, char arr[], long long int i, hash *HASH)
 {
 	// Assign 0 to left edge and recur
 	if (root->left) {
 
 		arr[i] = '0';
-		Encode(root->left, arr, i + 1);
+		Encode(root->left, arr, i+1, HASH);
 	}
 
 	// Assign 1 to right edge and recur
 	if (root->right) {
 
 		arr[i] = '1';
-		Encode(root->right, arr, i + 1);
+		Encode(root->right, arr, i+1, HASH);
 	}
 
 	if (eh_folha(root)) {
-		printf("%c: ", root->character);
-		//qtd_bits[root->character] = byte;
-		printVetor(arr, i);
+		//printf("%lld\n", i);
+		//printf("%s\n", arr);
+		/*printf("%s\n", arr);
+		printf("%c\n", root->character);
+		printf("%d\n", root->frequency);*/
+		SaveInHash(arr, i, HASH, root->character, root->frequency);
 	}
 }
 
@@ -279,17 +299,6 @@ int lenght_tree(Nodes *raiz) {
 	return (cont);
 }
 
-void header(int lenght_trash, int lenght_tree, Nodes *root, FILE* fileout) {
-	unsigned char *value = (unsigned char *) malloc(3 * sizeof(unsigned char));
-	value[0] = lenght_trash << 5 | lenght_tree >> 8;
-	value[1] = lenght_tree;
-	value[2] = '\0';
-
-	fputc(value[0], fileout);
-	fputc(value[1], fileout);
-	print_tree_huffman_file(fileout, root);
-}
-
 int convert_size_tree_to_bin(int size_tree, int bin[]) {
 	int aux;
 
@@ -311,42 +320,207 @@ int is_bit_set(unsigned char byte, int i) {
 	return (aux & byte);
 }
 
-/*int Cont_lixo_file(int qtd_bits[], heap Heap)
- {
- int i;
- long long int lixo = 0;
- for(i = 0; i < 256; i ++)
- {
- if(Heap->table->frequency != NULL)
- {
- lixo += (qtd_bits[i] * Heap->table[i]->frequency) % 8;
- }
- }
+int Cont_lixo_file(hash *HASH)
+{
+	int i;
+	long long int lixo = 0;
+	for(i = 0; i < 256; i ++)
+	{
+		 if(HASH->array[i]->frequencia >= 1)
+		 {
+			 lixo += strlen(HASH->array[i]->bits) * HASH->array[i]->frequencia;
+		 }
+	 }
 
- lixo = 8 - (lixo % 8);
+	 lixo = 8 - (lixo % 8);
 
- return lixo;
- }*/
+	 return lixo;
+}
 
+Nodes *construct_tree_descompress(Nodes *Nodes_huff, FILE *file_input_comprimido) {
+	unsigned char c;
+	fscanf(file_input_comprimido, "%c", &c);
 
+	if (c == 42) {
+		Nodes_huff = CreatNode(0, c, NULL, NULL);
+		Nodes_huff->left = construct_tree_descompress(Nodes_huff->left,
+				file_input_comprimido);
+		Nodes_huff->right = construct_tree_descompress(Nodes_huff->right,
+				file_input_comprimido);
+	} else {
+		if (c == '\\') {
+			fscanf(file_input_comprimido, "%c", &c);
+		}
+		Nodes_huff = CreatNode(0, c, NULL, NULL);
+	}
+	return Nodes_huff;
+}
+
+void *get_header(FILE *file, unsigned int *tam_lixo, unsigned int *tam_arv)
+{
+    unsigned char bytes_cabecalho = (unsigned char)fgetc(file);
+    *(tam_lixo) = bytes_cabecalho >> 5;
+
+    unsigned char five_bytes_from_tree = bytes_cabecalho << 3;
+    *(tam_arv) = five_bytes_from_tree >> 3;
+    bytes_cabecalho = (unsigned char)fgetc(file);
+    *(tam_arv) <<= 8;
+    *(tam_arv) |= bytes_cabecalho;
+}
+
+void descompress() {
+	FILE *file_input_descompress; //variavel que guardará o arquivo de entrada
+	FILE *file_output;
+	char nome_arquivo[30];
+	int j;
+	Nodes *temp;
+	unsigned char character;
+	unsigned int tam_lixo, tam_arv;
+	int i;
+	long long int tam_file = 0;
+	long long int bytes = 0;
+	char arquivo_saida[100];
+	int tam_arquivo_entrada = 0;
+	printf("Nome do arquivo a descompactar?\n");
+	scanf("%s", nome_arquivo);
+	file_input_descompress = fopen(nome_arquivo, "rb");
+	if (file_input_descompress == NULL) {
+		printf("Unable to open file: %s\n", nome_arquivo);
+		return;
+	}
+	bytes = FileSize(file_input_descompress);
+	fclose(file_input_descompress);
+	file_input_descompress = fopen(nome_arquivo, "rb");
+	/*while(fscanf(file_input_descompress, "%c", &character) != EOF)
+	{
+		tam_file++;
+	}*/
+	tam_arquivo_entrada = strlen(nome_arquivo);
+
+	int *header;
+	get_header(file_input_descompress, &tam_lixo, &tam_arv);
+	Nodes *root = construct_tree_descompress(root,
+			file_input_descompress);
+	Nodes *root_aux = root;
+	print_tree_huffman(root);
+	printf("\n");
+
+	//printf("TAM FILE: %lld\n", tam_file);
+
+	printf("TAM FILE: %lld\n", bytes);
+	printf("TAM LIXO: %d | TAM TREE: %d\n", tam_lixo, tam_arv);
+	for (i = 0; i < tam_arquivo_entrada - 5; i++) {
+		arquivo_saida[i] = nome_arquivo[i];
+	}
+	arquivo_saida[i] = '\0';
+
+	//printf("%s\n", arquivo_saida);
+	file_output = fopen(arquivo_saida, "wb");
+
+	temp = root;
+	//printf("%d %d\n", header[0], header[1]);
+	while (bytes > 0)
+	{
+		fscanf(file_input_descompress, "%c", &character);
+		//printf("%c\n", character);
+		if(bytes != 1)
+		{
+			for(i = 7; i>=0; i--)
+			{
+				if(is_bit_set(character, i))
+				{
+					root_aux = root_aux->right;
+				}
+				else
+				{
+					root_aux = root_aux->left;
+				}
+				if(eh_folha(root_aux))
+				{
+					fprintf(file_output, "%c", root_aux->character);
+					root_aux = root;
+				}
+			}
+		}
+		else
+		{
+			for(i = 7; i>=tam_lixo; i--)
+			{
+				if(is_bit_set(character, i))
+				{
+					root_aux = root_aux->right;
+				}
+				else
+				{
+					root_aux = root_aux->left;
+				}
+				if(eh_folha(root_aux))
+				{
+					fprintf(file_output, "%c", root_aux->character);
+					root_aux = root;
+				}
+			}
+		}
+		bytes -= 1;
+	}
+
+	fclose(file_input_descompress);
+	fclose(file_output);
+	printf("Descompactado com sucesso!\n");
+}
+
+void get_header_compactacao(FILE* fileout, hash *HASH, Nodes *root, int tam_arvore) {
+	unsigned char* bytes = (unsigned char*)malloc(3 * sizeof(unsigned char));
+	int lixo = Cont_lixo_file(HASH);
+
+	bytes[0] = lixo << 5 | tam_arvore >> 8;
+	bytes[1] = tam_arvore;
+
+	fputc(bytes[0], fileout);
+	fputc(bytes[1], fileout);
+
+	print_tree_huffman_file(fileout, root);
+}
 
 void compress() {
-	Nodes *root = construct_tree();
+	FILE *file_input;
+	char nome_arquivo[30];
+	printf("Informe o nome do arquivo.\n");
+	scanf("%s", nome_arquivo);
+	Nodes *root = construct_tree(nome_arquivo, file_input);
+	hash *HASH = create_hash();
+	FILE *file_output;
 	unsigned long long int size_tree;
-	char vetor[MAX];
+	unsigned char *vetor;
+
+	vetor = (char *)malloc(30 * sizeof(char));
 	int bin_tam[8];
 	int i = 0;
-	Encode(root, vetor, i);
+
+	Encode(root, vetor, 0, HASH);
 	int tam_str = strlen(vetor);
 	size_tree = lenght_tree(root);
 	printf("TAM DA ARVORE EM DECIMAL: %lld\n", size_tree);
-	//printf("%d", tam_str);
+
+	for (i = 0; i < 256; i++) {
+		if (HASH->array[i]->c > 1) {
+			printf("CHAR: %c BITS: %s FREQ: %d\n", HASH->array[i]->c, HASH->array[i]->bits, HASH->array[i]->frequencia);
+		}
+	}
+	int tam_lixo = Cont_lixo_file(HASH);
+	printf("LIXO: %d\n", tam_lixo);
+
+	char nome_file_output[30];
+    strcpy(nome_file_output, nome_arquivo);
+    strcat(nome_file_output, ".huff");
+
+	file_output = fopen(nome_file_output, "wb");
+	get_header_compactacao(file_output, HASH, root, size_tree);
 	//Decode(root, vetor, );
 	printf("PRE ORDEM: ");
 	print_tree_huffman(root);
 	printf("\n");
 	convert_size_tree_to_bin(size_tree, bin_tam);
-
 	for (i = 0; i < 14; i++) {
 		printf("%d", bin_tam[i]);
 	}
@@ -368,7 +542,7 @@ int main(void) {
 			compress();
 			break;
 		case 2:
-			//descompress();
+			descompress();
 			break;
 		default:
 			printf("OPCAO INVALIDA!");
