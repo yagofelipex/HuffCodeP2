@@ -45,7 +45,7 @@ heap *CreatTable(int size_table) {
 	return Table;
 }
 
-/*hash *create_hash()
+hash *create_hash()
 {
     hash* HASH = (hash*) malloc(sizeof(hash));
 
@@ -56,7 +56,7 @@ heap *CreatTable(int size_table) {
     	HASH->array[i]->bits[0] = '\0';
     }
     return HASH;
-}*/
+}
 
 // swap two min heap nodes//
 void Swap(Nodes **a, Nodes **b) {
@@ -231,45 +231,40 @@ Nodes *construct_tree(char nome_arquivo[], FILE *file_input) {
 	//View(Heap);
 }
 
-void SaveInHash(char v[], long long int tam, char c, unsigned int freq, hash *HASH) {
+/*void SaveInHash(char v[], long long int tam, char c, unsigned int freq, hash *HASH) {
 	int j;
-	HASH->array[c]->frequencia = freq;
+	printf("CHAR: %c | FREQ: %d | BITS: %s\n", c, freq, v);
+	//HASH->array[c]->frequencia = freq;
 	//printf("%d\n", freq);
-	HASH->array[c]->c = c;
+	//HASH->array[c]->c = c;
 	//printf("%c\n", c);
 	for (j = 0; j < tam; j++) {
 		//printf("%c", v[j]);
 		//int lng = strlen(v);
-		HASH->array[c]->bits[j] = v[j];
-
+		//HASH->array[c]->bits[j] = v[j];
 	}
-	printf("%s\n", HASH->array[c]->bits);
+	//printf("%s\n", HASH->array[c]->bits);
 	//printf("\n");
-}
+}*/
 
-void Encode(Nodes *root, char arr[], long long int i, hash *HASH)
+void Encode(Nodes *root, hash *HASH, char *new_path_bits)
 {
-	// Assign 0 to left edge and recur
-	if (root->left) {
-
-		arr[i] = '0';
-		Encode(root->left, arr, i+1, HASH);
-	}
-
-	// Assign 1 to right edge and recur
-	if (root->right) {
-
-		arr[i] = '1';
-		Encode(root->right, arr, i+1, HASH);
-	}
-
-	if (eh_folha(root)) {
-		//printf("%lld\n", i);
-		//printf("%s\n", arr);
-		/*printf("%s\n", arr);
-		printf("%c\n", root->character);
-		printf("%d\n", root->frequency);*/
-		SaveInHash(arr, i, root->character, root->frequency, HASH);
+	if(root != NULL)
+	{
+		if(eh_folha(root))
+		{
+			printf("%c : %s\n", root->character, new_path_bits);
+			strcat(HASH->array[root->character]->bits, new_path_bits);
+			HASH->array[root->character]->frequencia = root->frequency;
+			HASH->array[root->character]->c = root->character;
+		}
+		else
+		{
+			Encode(root->left, HASH, strcat(new_path_bits, "0"));
+			new_path_bits[strlen(new_path_bits) - 1] = '\0';
+			Encode(root->right, HASH, strcat(new_path_bits, "1"));
+			new_path_bits[strlen(new_path_bits) - 1] = '\0';
+		}
 	}
 }
 
@@ -357,7 +352,7 @@ Nodes *construct_tree_descompress(Nodes *Nodes_huff, FILE *file_input_comprimido
 	return Nodes_huff;
 }
 
-void *get_header(FILE *file, unsigned int *tam_lixo, unsigned int *tam_arv)
+void get_header(FILE *file, unsigned int *tam_lixo, unsigned int *tam_arv)
 {
     unsigned char bytes_cabecalho = (unsigned char)fgetc(file);
     *(tam_lixo) = bytes_cabecalho >> 5;
@@ -489,22 +484,14 @@ void compress() {
 	printf("Informe o nome do arquivo.\n");
 	scanf("%s", nome_arquivo);
 	Nodes *root = construct_tree(nome_arquivo, file_input);
-	hash *HASH;
+	hash *HASH = create_hash();
 	FILE *file_output;
 	int bin_tam[8];
 	int i = 0;
 	unsigned long long int size_tree;
-	unsigned char *vetor;
-
-	vetor = (char *)malloc(30 * sizeof(char));
-	HASH = (hash*) malloc(sizeof(hash));
-
-	for (i = 0; i < 256; i++)
-	{
-		HASH->array[i] = (NewValue*)malloc(sizeof(NewValue));
-	}
-
-	Encode(root, vetor, 0, HASH);
+	unsigned char *vetor = (unsigned char *)malloc(30 * sizeof(unsigned char));
+	i = 0;
+	Encode(root, HASH, vetor);
 	int tam_str = strlen(vetor);
 	size_tree = lenght_tree(root);
 	printf("TAM DA ARVORE EM DECIMAL: %lld\n", size_tree);
