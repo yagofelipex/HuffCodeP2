@@ -45,7 +45,7 @@ heap *CreatTable(int size_table) {
 	return Table;
 }
 
-hash *create_hash()
+/*hash *create_hash()
 {
     hash* HASH = (hash*) malloc(sizeof(hash));
 
@@ -53,10 +53,10 @@ hash *create_hash()
     {
     	HASH->array[i] = (NewValue*) malloc(sizeof(NewValue));
     	HASH->array[i]->frequencia = 0;
-    	//HASH->array[i]->bits[0] = '\0';
+    	HASH->array[i]->bits[0] = '\0';
     }
     return HASH;
-}
+}*/
 
 // swap two min heap nodes//
 void Swap(Nodes **a, Nodes **b) {
@@ -231,18 +231,19 @@ Nodes *construct_tree(char nome_arquivo[], FILE *file_input) {
 	//View(Heap);
 }
 
-void SaveInHash(char v[], long long int tam, hash *HASH, char c, unsigned int freq) {
+void SaveInHash(char v[], long long int tam, char c, unsigned int freq, hash *HASH) {
 	int j;
-
 	HASH->array[c]->frequencia = freq;
+	//printf("%d\n", freq);
 	HASH->array[c]->c = c;
-
+	//printf("%c\n", c);
 	for (j = 0; j < tam; j++) {
 		//printf("%c", v[j]);
 		//int lng = strlen(v);
 		HASH->array[c]->bits[j] = v[j];
-	}
 
+	}
+	printf("%s\n", HASH->array[c]->bits);
 	//printf("\n");
 }
 
@@ -268,7 +269,7 @@ void Encode(Nodes *root, char arr[], long long int i, hash *HASH)
 		/*printf("%s\n", arr);
 		printf("%c\n", root->character);
 		printf("%d\n", root->frequency);*/
-		SaveInHash(arr, i, HASH, root->character, root->frequency);
+		SaveInHash(arr, i, root->character, root->frequency, HASH);
 	}
 }
 
@@ -488,14 +489,20 @@ void compress() {
 	printf("Informe o nome do arquivo.\n");
 	scanf("%s", nome_arquivo);
 	Nodes *root = construct_tree(nome_arquivo, file_input);
-	hash *HASH = create_hash();
+	hash *HASH;
 	FILE *file_output;
+	int bin_tam[8];
+	int i = 0;
 	unsigned long long int size_tree;
 	unsigned char *vetor;
 
 	vetor = (char *)malloc(30 * sizeof(char));
-	int bin_tam[8];
-	int i = 0;
+	HASH = (hash*) malloc(sizeof(hash));
+
+	for (i = 0; i < 256; i++)
+	{
+		HASH->array[i] = (NewValue*)malloc(sizeof(NewValue));
+	}
 
 	Encode(root, vetor, 0, HASH);
 	int tam_str = strlen(vetor);
@@ -503,7 +510,7 @@ void compress() {
 	printf("TAM DA ARVORE EM DECIMAL: %lld\n", size_tree);
 
 	for (i = 0; i < 256; i++) {
-		if (HASH->array[i]->c > 1) {
+		if (HASH->array[i]->frequencia > 1) {
 			printf("CHAR: %c BITS: %s FREQ: %d\n", HASH->array[i]->c, HASH->array[i]->bits, HASH->array[i]->frequencia);
 		}
 	}
