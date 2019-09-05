@@ -4,14 +4,21 @@
 #include <string.h>
 
 
-Nodes *construct_tree(char nome_arquivo[], FILE *file_input) {
+void conting_freq(FILE *file_input, hash *Hash)
+{
+	long long int bytes = 0;
+	unsigned char c;
+	while(fscanf(file_input,"%c", &c) != EOF)
+	{
+		Hash->array[c]->frequencia++;
+	}
+}
+
+Nodes *construct_tree(char nome_arquivo[], FILE *file_input, hash *Hash) {
 	FILE *file_output; //variavel que guardará o arquivo de entrada e saida
 	unsigned char caracter;
 	//char nome_arquivo[30];
-	Nodes *root;
-	Nodes *left;
-	Nodes *right;
-	Nodes *top;
+	Nodes *root, *left, *right, *top;
 	int byte = 0;
 
 	heap *Heap = CreatTable(256);
@@ -25,19 +32,15 @@ Nodes *construct_tree(char nome_arquivo[], FILE *file_input) {
 		printf("Unable to open file: %s\n", nome_arquivo);
 		exit(1);
 	} else {
-		while (fscanf(file_input, "%c", &caracter) != EOF) {
-			string[caracter]++;
-			byte++;
-			//printf("%c", caracter);
-		}
+		conting_freq(file_input, Hash);
 	}
 	/*printf("****************************************\n");
 	printf("SIZE FILE: %lld\n", FileSize(file_input));
 	printf("****************************************\n");*/
 	for (i = 0; i < 256; i++) {
-		if (string[i] >= 1) {
-			Insert(string[i], i, Heap, NULL, NULL);
-			printf("Characters: %c Frequency: %d\n", i, string[i]);
+		if (Hash->array[i]->frequencia >= 1) {
+			Insert(Hash->array[i]->frequencia, i, Heap, NULL, NULL);
+			printf("Characters: %c Frequency: %d\n", i, Hash->array[i]->frequencia);
 		}
 	}
 
@@ -90,24 +93,24 @@ void compress() {
 	char nome_arquivo[30];
 	printf("Informe o nome do arquivo.\n");
 	scanf("%s", nome_arquivo);
-	Nodes *root = construct_tree(nome_arquivo, file_input);
 	hash *HASH = create_hash();
+	Nodes *root = construct_tree(nome_arquivo, file_input, HASH);
 	FILE *file_output;
 	int bin_tam[8];
 	int i = 0;
 	unsigned long long int size_tree;
-	unsigned char *vetor = (unsigned char *)malloc(30 * sizeof(unsigned char));
+	unsigned char *vetor = (unsigned char *)malloc(10 * sizeof(unsigned char));
 	i = 0;
 	Encode(root, HASH, vetor);
 	int tam_str = strlen(vetor);
 	size_tree = lenght_tree(root);
 	printf("TAM DA ARVORE EM DECIMAL: %lld\n", size_tree);
 
-	for (i = 0; i < 256; i++) {
+	/*for (i = 0; i < 256; i++) {
 		if (HASH->array[i]->frequencia > 1) {
 			printf("CHAR: %c BITS: %s FREQ: %d\n", HASH->array[i]->c, HASH->array[i]->bits, HASH->array[i]->frequencia);
 		}
-	}
+	}*/
 	int tam_lixo = Cont_lixo_file(HASH);
 	printf("LIXO: %d\n", tam_lixo);
 
