@@ -58,12 +58,13 @@ void Encode(Nodes *root, hash *HASH, char *new_path_bits)
 {
 	if(root != NULL)
 	{
+		unsigned char item = root->character;
 		if(eh_folha(root))
 		{
-			printf("%c : %s\n", root->character, new_path_bits);
-			strcat(HASH->array[root->character]->bits, new_path_bits);
-			HASH->array[root->character]->frequencia = root->frequency;
-			HASH->array[root->character]->c = root->character;
+			printf("%c : %s\n", item, new_path_bits);
+			strcat(HASH->array[item]->bits, new_path_bits);
+			HASH->array[item]->frequencia = root->frequency;
+			HASH->array[item]->c = root->character;
 		}
 		else
 		{
@@ -88,6 +89,16 @@ void get_header_compactacao(FILE* fileout, hash *HASH, Nodes *root, int tam_arvo
 	print_tree_huffman_file(fileout, root);
 }
 
+void escrever_file_(FILE *file_input, FILE *file_output, hash *HASH)
+{
+	unsigned char c;
+	char byte;
+	while(fscanf(file_input,"%c", &c) != EOF)
+	{
+		
+	}
+}
+
 void compress() {
 	FILE *file_input;
 	char nome_arquivo[30];
@@ -106,11 +117,11 @@ void compress() {
 	size_tree = lenght_tree(root);
 	printf("TAM DA ARVORE EM DECIMAL: %lld\n", size_tree);
 
-	/*for (i = 0; i < 256; i++) {
+	for (i = 0; i < 256; i++) {
 		if (HASH->array[i]->frequencia > 1) {
 			printf("CHAR: %c BITS: %s FREQ: %d\n", HASH->array[i]->c, HASH->array[i]->bits, HASH->array[i]->frequencia);
 		}
-	}*/
+	}
 	int tam_lixo = Cont_lixo_file(HASH);
 	printf("LIXO: %d\n", tam_lixo);
 
