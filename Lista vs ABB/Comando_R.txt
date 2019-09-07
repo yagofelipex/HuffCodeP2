@@ -4,14 +4,13 @@ VALUE <- data$value
 LIST <- data$list
 ABB <- data$abb
 
-
 VALUE <- sort(VALUE)
 LIST <- sort(LIST)
 ABB <- sort(ABB)
 
 plot(LIST, type = "l", lwd = 4, xlab="Valores", ylab="Comparações", col="red")
 
-lines(ABB, type = "l", lwd = 4, col="black")
+lines(stats::lowess(ABB), type = "l", lwd = 4, col="black")
 
 title(main = "LIST x ABB", font.main=1)
 
