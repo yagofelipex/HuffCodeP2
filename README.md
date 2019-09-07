@@ -6,16 +6,8 @@ Professor da disciplina:
 Márcio Ribeiro          - Professor Adjunto           - marcio@ic.ufal.br
 
 Participantes:
-Elygledson José         - Ciência da Computação       - ejsb2@ic.ufal.br
-Yago Felipe             - Ciência da Computação       - yflf@ic.ufal.br
-Marconde José da Silva  - Ciência da Computação       - FALTA MANDAR
-Alasson de Araújo       - Ciência da Computação       - aaa4@ic.ufal.br
-Wilamis Micael          - Engenharia de Computação    - wilamis.micael@gmail.com
-
-# INSTRUÇÕES DE USO
-
-
-FALTA DIGITAR
-
-
-
+Elygledson José         - Ciência da Computação       - ejsb2@ic.ufal.br &#013
+Yago Felipe             - Ciência da Computação       - yflf@ic.ufal.br &#013
+Marconde José da Silva  - Ciência da Computação       - FALTA MANDAR &#013
+Alasson de Araújo       - Ciência da Computação       - aaa4@ic.ufal.br &#013
+Wilamis Micael          - Engenharia de Computação    - wilamis.micael@gmail.com &#013
