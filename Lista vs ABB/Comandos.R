@@ -1,18 +1,7 @@
-data <- read.table(file.choose(), header=T, sep=" ")
+par(mfrow=c(1,2))
 
-VALUE <- data$value
-LIST <- data$list
-ABB <- data$abb
+list_c <- read.csv(file.choose(), header=TRUE, sep=",")
+plot(list_c$list, ylab="Comparações", xlab="Valores", main="LISTA",bty="l", tcl=0.3, col = "red")
 
-VALUE <- sort(VALUE)
-LIST <- sort(LIST)
-ABB <- sort(ABB)
-
-plot(LIST, type = "l", lwd = 4, xlab="Valores", ylab="Comparações", col="red")
-
-lines(stats::lowess(ABB), type = "l", lwd = 4, col="black")
-
-title(main = "LIST x ABB", font.main=1)
-
-legend("topleft", c("List", "ABB"), cex=0.8, 
-       col=c("red", "black"), pch=21:21, lty=1:1)
+size_abb <- read.csv(file.choose() , header=TRUE, sep=",")
+plot(size_abb$abb, ylab="Comparações", xlab="Valores", main="ABB",bty="l",ylim=c(0,2000),tcl=0.3, col = "blue")
