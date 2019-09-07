@@ -21,7 +21,7 @@ typedef struct Array {
 
 typedef struct SaveValues {
 	unsigned int frequencia;
-	char c;
+	unsigned char c;
 	unsigned char bits[10];
 } NewValue;
 
@@ -99,6 +99,12 @@ int is_bit_set(unsigned char byte, int i) {
 	return (aux & byte);
 }
 
+unsigned char set_bit(unsigned char c, int i)
+{
+	unsigned char aux = 1 << i;
+    return aux | c;
+}
+
 void View(heap *Heap) {
 	int i;
 	for (i = 1; i <= Heap->size; i++) {
@@ -165,7 +171,7 @@ void Insert(int Value, char character, heap *Heap, Nodes *left, Nodes *right) {
 
 void print_tree_huffman(Nodes *huffman_node) {
 	if (huffman_node != NULL) {
-		if (((huffman_node->character == '*') || (huffman_node->character == 92))
+		if (((huffman_node->character == '*') || (huffman_node->character == '\\'))
 				&& eh_folha(huffman_node)) {
 			printf("%c", 92);
 		}
