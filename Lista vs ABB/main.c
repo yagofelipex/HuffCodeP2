@@ -26,7 +26,7 @@ void troca(struct Nos *n1, struct Nos *n2);
 struct abb *novo_no(int valor);
 void printf_abb(struct abb *raiz);
 struct abb *inserir_na_abb(struct abb *novo, int valor);
-struct abb *buscar_na_arvore(struct abb *raiz, int item, int *cont);
+int buscar_na_arvore(struct abb *raiz, int item, int *cont);
 int busca_na_lista(struct Nos* LISTA, int valor);
 void print_arvore(struct abb* raiz);
 void print_pre_ordem(struct abb* raiz);
@@ -34,6 +34,8 @@ int numero_procurado_lista(struct Nos *LISTA, int valor);
 int numero_procurado_abb(struct abb *raiz, int valor);
 void selection_sort_vetor(int num[], int tam);
 struct abb *create_binary_tree(int item, struct abb *left, struct abb *right);
+void order_list_numbers(int size, int numbers[]);
+void order_abb_numbers(int size, int numbers[]);
 //struct abb *buscar_na_arvore(int valor);
 
 int main() {
@@ -43,9 +45,12 @@ int main() {
 	int *r_comp_lista;
 	int *r_comp_abb;
 	int *numeros_comparados;
-	long long int aux = 0;
-	long long int i;
+	int aux = 0;
+	int i;
 	int QTD = 0;
+
+	int *sort_abb = (int*)malloc(sizeof(int) * MAX_ELEMENT);
+	int *sort_list = (int*)malloc(sizeof(int) * MAX_ELEMENT);
 	int *elementos = (int*)malloc(sizeof(int) * MAX_ELEMENT);
 	r_comp_lista = (int*) malloc(sizeof(int) * MAX_ELEMENT);
 	r_comp_abb = (int*) malloc(sizeof(int) * MAX_ELEMENT);
@@ -69,6 +74,7 @@ int main() {
 		case 1:
 			printf("QUANTIDADE DE NUMEROS A SEREM GERADOS?\n");
 			scanf("%d", &QTD);
+			sort_abb[QTD], sort_list[QTD];
 			for (i = 0; i <= QTD; i++) {
 				n = (rand() % QTD);
 				elementos[i] = n;
@@ -76,30 +82,36 @@ int main() {
 				selectionSort(LISTA);
 				raiz = inserir_na_abb(raiz, n);
 			}
-			FILE *list_vs_abb = fopen("list_vs_abb_out.txt", "w");
-			fprintf(list_vs_abb, "value list abb\n");
+			FILE *abb = fopen("abb.csv", "w");
+			FILE *list = fopen("list.csv", "w");
+			fprintf(abb,"size,abb\n");
+			fprintf(list,"size,list_c\n");
 			for (i = 0; i < QTD; i++) {
 				int sorteado = elementos[i];
 				int comp_list = busca_na_lista(LISTA, sorteado);
 				int comp_abb;
-				//printf("Número sorteado: %d\n", sorteado);
-				//printf("Número de comparações: %d\n", comp_list);
 				buscar_na_arvore(raiz, sorteado, &comp_abb);
-				//fprintf(list_vs_abb, "%d\n", comp_abb[0]);
-				//printf("numero de comparacoes abb: %d\n", comp_abb);
-				fprintf(list_vs_abb, "%d %d %d\n", sorteado, comp_list, comp_abb);
+				sort_list[i] = comp_list;
+      	 	 	sort_abb[i] = comp_abb;
 				comp_list =0;
 				comp_abb = 0;
 			}
-			fclose(list_vs_abb);
+				order_abb_numbers(QTD, sort_abb);
+    			order_list_numbers(QTD, sort_list);
+
+    			for (i = 0; i < QTD; i++)
+   	 			{
+        			fprintf(list,"%d,%d\n",i, sort_list[i]);
+        			fprintf(abb, "%d,%d\n",i, sort_abb[i]);
+    			}
+    			fclose(list);
+    			fclose(abb);
 			printf("Arquivo de saída gerado com sucesso!\n");
 			break;
 		case 2:
 			printf_lista(LISTA);
 			break;
 		case 3:
-			//printf_abb(raiz);
-			//print_arvore(raiz);
 			print_pre_ordem(raiz);
 			printf("\n");
 			break;
@@ -208,43 +220,40 @@ void print_pre_ordem(struct abb* raiz) {
 
 struct abb *inserir_na_abb(struct abb *raiz, int valor)
 {
-	/* 1.  Perform the normal BST rotation */
-	if (raiz == NULL) {
-		return (create_binary_tree(valor, NULL, NULL));
-	}
-
-	struct abb *aux = raiz;
-	struct abb *previous;
-
-	while (aux != NULL) {
-		previous = aux;
-		if (valor < aux->valor) {
-			aux = aux->esq;
-		} else {
-			aux = aux->dir;
-		}
-	}
-
-	if (valor < previous->valor) {
-		previous->esq = create_binary_tree(valor, NULL, NULL);
-	} else {
-		previous->dir = create_binary_tree(valor, NULL, NULL);
-	}
-
-	/* return the (unchanged) bt pointer */
-	return raiz;
+    if(raiz == NULL) return create_binary_tree(valor,NULL, NULL);
+    /* Adiciona de forma ordenada na árvore */
+    /* Os valores menores ficam à esquerda e os maiores à direita */
+    if(valor < raiz->valor)
+    {
+        raiz->esq = inserir_na_abb(raiz->esq, valor);
+    }
+    else
+    {
+        raiz->dir = inserir_na_abb(raiz->dir, valor);
+    }
+    /* Retorna a nova árvore */
+    return raiz;
 }
 
-struct abb *buscar_na_arvore(struct abb *raiz, int item, int *cont) {
-	struct abb  *new_bt = raiz;
-    *cont += 1;
-    if ((new_bt == NULL) || (new_bt->valor == item)) {
-        return new_bt;
-    } else if (new_bt->valor > item) {
-    	buscar_na_arvore(new_bt->esq, item, cont);
-    } else {
-    	buscar_na_arvore(new_bt->dir, item, cont);
+int buscar_na_arvore(struct abb *raiz, int item, int *cont) {
+	if(raiz == NULL) return -1;
+    /* Incrementa no número de comparações */
+    (*cont)+=1;
+    if(raiz->valor == item)
+    {
+        return *cont;
     }
+    else
+    {
+        if(item < raiz->valor)
+        {
+            return buscar_na_arvore(raiz->esq, item,cont);
+        }
+        else
+        {
+            return buscar_na_arvore(raiz->dir, item,cont);
+        }
+      }
 }
 
 int busca_na_lista(struct Nos* LISTA, int valor) {
@@ -258,4 +267,40 @@ int busca_na_lista(struct Nos* LISTA, int valor) {
 		comparacao++;
 		LISTA = LISTA->proximo;
 	}
+}
+
+void order_abb_numbers(int size, int numbers[])
+{
+    int i,j;
+    int aux;
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size - 1; j++)
+        {
+            if(numbers[j] > numbers[j + 1])
+            {
+                aux = numbers[j];
+                numbers[j] = numbers[j+1];
+                numbers[j+1] = aux;
+            }
+        }
+    }
+}
+/* Ordena os numeros que foram gerados aleatoriamente na lista*/
+void order_list_numbers(int size, int numbers[])
+{
+    int i,j;
+    int aux;
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size - 1; j++)
+        {
+            if(numbers[j] > numbers[j + 1])
+            {
+                aux = numbers[j];
+                numbers[j] = numbers[j+1];
+                numbers[j+1] = aux;
+            }
+        }
+    }
 }
