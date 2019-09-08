@@ -94,15 +94,14 @@ int esta_vazia(Nodes *raiz) {
 
 int is_bit_set(unsigned char byte, int i) {
 
-	unsigned int aux = 1;
-	aux = aux << (unsigned int) i;
+	unsigned char aux = 1 << i;
 	return (aux & byte);
 }
 
 unsigned char set_bit(unsigned char c, int i)
 {
 	unsigned char aux = 1 << i;
-    return aux | c;
+    	return aux | c;
 }
 
 void View(heap *Heap) {
