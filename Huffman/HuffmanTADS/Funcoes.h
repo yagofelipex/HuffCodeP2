@@ -175,9 +175,9 @@ hash *create_hash();
 
 void Swap(Nodes **a, Nodes **b);
 
-/* Essa função serve para
- *
- *
+/* Essa função serve para realizar a troca de nós
+ * através do endereço passado deles.
+ * Os argumentos são: dois nós.
  */
 
 int GetParentIndex(int index);
@@ -202,11 +202,43 @@ int GetChildrenRightIndex(int index);
  */
 
 void View(heap *Heap);
+
+/*
+ *
+ */
+
 void DownHeapMin(int index, heap *Heap);
+
+/*
+ *
+ */
+
 Nodes *Pop(heap *Heap);
+
+/*
+ *
+ */
+
 void UpHeapMin(int index, heap *Heap);
+
+/*
+ *
+ */
+
 void Insert(int Value, char character, heap *Heap, Nodes *left, Nodes *right);
+
+/*
+ *
+ */
+
 int eh_folha(Nodes *huffman_node);
+
+/*
+ * Dado um nó de uma árvore essa funcão verifica se ele possui
+ * filhos à esquerda e direita. Se ambas as respostas forem nulas
+ * então o nó é uma folha e será retornado 1. Caso negativo 0.
+ * O argumento é o node.
+ */
 
 /*
  * Essa função serve para verificar se dado a raiz de uma arvore
@@ -233,9 +265,52 @@ void print_tree_huffman_file(FILE *output_file, Nodes *huffman_node);
 
 
 int esta_vazia(Nodes *raiz);
+
+/*
+ * Essa função verifica se a árvore está vazia,
+ * pela raiz passada. Se for ela nula retorna 1
+ * e 0 caso contrário.
+ * O argumento é a raíz da árvore.
+ *
+ */
+
 int lenght_tree(Nodes *raiz);
-int convert_size_tree_to_bin(int size_tree, int bin[]);
+
+/*
+ * FALTA ENTENDER UMA LOGICA.
+ *
+ */
+
 int is_bit_set(unsigned char byte, int i);
+
+/*
+ * Essa função verifca se um bit de algum byte dado o caractere de acordo com a posição i
+ * está setado (ativo) usando operador lógico E (&)
+ * Os argumentos são: um caractere sem sinal e um inteiro
+ *
+ */
+
 unsigned char set_bit(unsigned char c, int i);
+
+/*
+ * Essa função seta um bit de algum byte dado o caractere de acordo com a posição i
+ * utilizando operador lógico OU (|)
+ * Seja o byte aux totalmente zero: |00000000| seja i = 7 logo o byte será: |10000000|
+ * Os argumentos são: um caractere sem sinal e um inteiro
+ *
+ */
 int Cont_lixo_file(hash *HASH);
+
+/*
+ *  Essa função tem o objetivo de descobrir o lixo que terá os novos bits do nosso arquivo.
+ *  O lixo será a soma de todos os bits com o produto da frequencia de todos dos caracteres.
+ *  Após a operação citada será necessário pegar o resto dela por 8. Depois disso subtrair
+ *  8 do resto tirado e então teremos o bite do lixo.
+ *  Essa função pecorre as 256 posições da hash uma de cada vez onde pega o tamanho do array
+ *  de bits guardados (de acordo com o caractere) e em seguida multiplica pela frequencia
+ *  (de acordo com o caractere).
+ *  O argumento é a Hash.
+ *
+ */
+
 #endif
