@@ -39,6 +39,10 @@ void test_tree() {
 }
 
 void test_heap() {
+
+	/*
+	 * TESTANDO Insert() e Pop();
+	 */
 	unsigned char letter0 = 'A';
 	int frequency0 = 7;
 	heap *new_heap = CreatTable(256);
@@ -64,9 +68,15 @@ void test_heap() {
 	CU_ASSERT_PTR_NULL(new_heap->table[tam_heap]->left);
 	CU_ASSERT_PTR_NULL(new_heap->table[tam_heap]->right);
 
+
 	Nodes *beforeLEFT = new_heap->table[1];
 	Nodes *beforeRIGHT = new_heap->table[2];
+
+	CU_ASSERT_EQUAL(2, new_heap->size);
+	CU_ASSERT_TRUE((new_heap->table[0]) < new_heap->table[new_heap->size-1]);
+
 	left = Pop(new_heap);
+
 	CU_ASSERT_PTR_NOT_NULL(left);
 	CU_ASSERT_EQUAL(left, beforeLEFT);
 	right = Pop(new_heap);
@@ -77,7 +87,6 @@ void test_heap() {
 
 	Insert(soma_freq, '*', new_heap, left, right);
 	tam_heap = new_heap->size;
-
 
 
 	CU_ASSERT_PTR_NOT_NULL(new_heap->table[tam_heap]->left);
