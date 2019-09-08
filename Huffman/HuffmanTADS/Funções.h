@@ -70,8 +70,7 @@ void insert_header_file(char nome_arquivo[], hash *HASH, Nodes *root,
  *
  */
 
-void insert_file_binary(FILE *file_input, FILE *file_out, hash *HASH,
-	char nome_arquivo[]);
+void insert_file_binary(FILE *file_input, FILE *file_out, hash *HASH,char nome_arquivo[]);
 
 /*
  * Essa funcão irá realizar a compressao dos bytes e jogá-los no novo arquivo de saída
@@ -182,54 +181,40 @@ void Swap(Nodes **a, Nodes **b);
 
 int GetParentIndex(int index);
 
-/*
- *
- *
- */
+/*Essa função retorna o index do pai*/
 
 int GetChildrenLeftIndex(int index);
 
-/*
- *
- *
- */
+/*Essa função retorna o index do filho a esquerda*/
 
 int GetChildrenRightIndex(int index);
 
-/*
- *
- *
- */
+ /*Essa função retorna o index do filho a direita da raiz*/
 
 void View(heap *Heap);
 
-/*
- *
- */
+/*Essa função serve para mostrarmos na saída os caracteres e a sua frequência */
 
 void DownHeapMin(int index, heap *Heap);
 
-/*
- *
- */
+/*Após a exclusão de algum elemento essa função é chamada para que possamos manter a característica da miniheap.
+*Característica:todos os nós pais são menores que os nós filhos.
+*/
 
 Nodes *Pop(heap *Heap);
 
-/*
- *
- */
+/*Usamos essa função para "eliminar" o nó raiz colocando o último elemento da estrutura na posição dele 
+e o nó raiz que queremos remover colocamos na última posição e por fim 
+diminuimos a quantidade de elementos.
+*/
 
 void UpHeapMin(int index, heap *Heap);
 
-/*
- *
- */
+/*Essa função tem como objetivo ordenar os nós de forma crescente.*/
 
 void Insert(int Value, char character, heap *Heap, Nodes *left, Nodes *right);
 
-/*
- *
- */
+/*Aqui é onde inserimos os elementos na estrutura.*/
 
 int eh_folha(Nodes *huffman_node);
 
