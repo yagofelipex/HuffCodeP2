@@ -225,19 +225,4 @@ int Cont_lixo_file(hash *HASH)
 
 	 return lixo;
 }
-
-int convert_size_tree_to_bin(int size_tree, int bin[]) {
-	int aux;
-
-	for (aux = 13; aux >= 0; aux--) {
-		if (size_tree % 2 == 0) {
-			bin[aux] = 0;
-		} else {
-			bin[aux] = 1;
-		}
-		size_tree = size_tree / 2;
-	}
-	return *bin;
-}
-
 #endif
