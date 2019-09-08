@@ -23,4 +23,6 @@ Será necessário baixar todos os arquivos da pasta Huffman e compilar a classe 
 
 * Descompress.c: Ela recebe o nome do arquivo para descompressão e realiza os procedimentos necessários para descompressão. Do arquivo comprimimdo é obtido o cabeçalho com o lixo e a árvore em pré-ordem. Com a pré ordem montamos a árvore de huffman e em seguida lemos caractere a caractere do arquivo para saber é 0 ou 1, se for 0 estará à esquerda da árvore, se for 1 estará à direita. Quando encontrarmos um nó folha escrevemos o caractere no arquivo de saída descomprimido. Será realizado isso até nao houver mais caracteres a serem lidos no arquivo comprimido.
 
-
+Na pasta HuffmanTADS estão os Tipos Abstrato de Dados utilizado nas estruturas. Contém os arquivos:
+* Huffman.h: Biblioteca criada para armazenar as estruturas: Nodes, Heap e Hash assim como os seus tipos abstratos necessários e propriedades para utilização das estrutruras.
+* Funcoes.h: Biblioteca criada com todas as funções usadas em todo o algoritmo no qual está comentada o que cada função faz e no que é utilizada, serve como documentação para as funções.
